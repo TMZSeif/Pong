@@ -18,8 +18,9 @@ WINNER_FONT = pygame.font.SysFont("aria", 100)
 PLAYER1_WINS = pygame.event.Event(pygame.USEREVENT + 1)
 PLAYER2_WINS = pygame.event.Event(pygame.USEREVENT + 2)
 
-BOUNCE = pygame.mixer.Sound("Assets/bounce.mp3")
-#LONG_BOUNCE = pygame.mixer.Sound(os.path.join("Assets", "long-bounce.mp3"))
+BOUNCE = pygame.mixer.Sound(os.path.join("Assets", "bounce.wav"))
+BACKGROUND_MUSIC = pygame.mixer.Sound(os.path.join("Assets", "music.mp3"))
+WIN_MUSIC = pygame.mixer.Sound(os.path.join("Assets", "win.mp3"))
 
 WIN = pygame.display.set_mode((WIDTH, HEIGHT), vsync=1)
 PLAYER1 = pygame.Rect(50, HEIGHT/2 - 50, 10, 100)
@@ -64,6 +65,7 @@ def handle_pong_collision(player1, player2):
 	if PONG_COORDS[1] + 5 >= HEIGHT or PONG_COORDS[1] - 5 <= 0:
 		pong_direction_y = -pong_direction_y
 		pong_vel += pong_vel/10
+		BOUNCE.play()
 	if player1.collidepoint(PONG_COORDS[0] - 5, PONG_COORDS[1]):
 		pong_direction_x = "right"
 		pong_vel += pong_vel/10
@@ -84,6 +86,9 @@ def handle_player2_wins(player1, player2):
 		player2.x = WIDTH - 50
 		player2.y = HEIGHT/2 - player2.height
 		print("Player 2 Wins!")
+		WIN_MUSIC.play()
+		
+		BACKGROUND_MUSIC.stop()
 		return "player 2"
 
 def handle_player1_wins(player1, player2):
@@ -98,11 +103,16 @@ def handle_player1_wins(player1, player2):
 		player2.x = WIDTH - 50
 		player2.y = HEIGHT/2 - player2.height
 		print("Player 1 Wins!")
+		WIN_MUSIC.play()
+		pygame.time.delay(700)
+		WIN_MUSIC.stop()
+		BACKGROUND_MUSIC.stop()
 		return "player 1"
 
 def main():
 	run = True
 	clock = pygame.time.Clock()
+	BACKGROUND_MUSIC.play(-1)
 	while run:
 		clock.tick(30)
 		for event in pygame.event.get():
