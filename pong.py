@@ -1,6 +1,7 @@
 import pygame
 import os
 import random
+pygame.font.init()
 
 WIDTH, HEIGHT = 900, 600
 VEL = 5
@@ -10,6 +11,10 @@ BLACK = (0, 0, 0)
 
 pong_direction_x = random.choice(["right", "left"])
 pong_direction_y = random.randint(-HEIGHT, HEIGHT)
+
+WINNER_FONT = pygame.font.SysFont("aria", 100)
+PLAYER1_WINS = pygame.event.Event(pygame.USEREVENT + 1)
+PLAYER2_WINS = pygame.event.Event(pygame.USEREVENT + 2)
 
 WIN = pygame.display.set_mode((WIDTH, HEIGHT), vsync=1)
 PLAYER1 = pygame.Rect(50, HEIGHT/2 - 50, 10, 100)
@@ -57,6 +62,33 @@ def handle_pong_collision(player1, player2):
 	if player2.collidepoint(PONG_COORDS[0] + 5, PONG_COORDS[1]):
 		pong_direction_x = "left"
 
+def handle_player2_wins(player1, player2):
+	global PONG_COORDS
+	if PONG_COORDS[0] + 5 <= 0:
+		print("Player 2 Wins!")
+		pygame.event.post(PLAYER2_WINS)
+		PONG_COORDS = [WIDTH/2, HEIGHT/2]
+		player1.x = 50
+		player1.y = HEIGHT/2 - player1.height
+		player2.x = WIDTH - 50
+		player2.y = HEIGHT/2 - player2.height
+		print("Player 2 Wins!")
+		return "player 2"
+
+def handle_player1_wins(player1, player2):
+	global PONG_COORDS
+	if PONG_COORDS[0] - 5 >= WIDTH:
+		print(PONG_COORDS)
+		print("Player 1 Wins!")
+		pygame.event.post(PLAYER1_WINS)
+		PONG_COORDS = [WIDTH/2, HEIGHT/2]
+		player1.x = 50
+		player1.y = HEIGHT/2 - player1.height
+		player2.x = WIDTH - 50
+		player2.y = HEIGHT/2 - player2.height
+		print("Player 1 Wins!")
+		return "player 1"
+
 def main():
 	run = True
 	clock = pygame.time.Clock()
@@ -65,6 +97,32 @@ def main():
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
 				run = False
+				pygame.quit()
+			if event.type == PLAYER1_WINS:
+				break
+			if event.type == PLAYER2_WINS:
+				break
+		
+		winner_text = ""
+		
+		if handle_player2_wins(PLAYER1, PLAYER2) == "player 2":
+			print("Player 2 Wins!")
+			winner_text = "Player 2 Wins!"
+			winner_text = WINNER_FONT.render(winner_text, 1, WHITE)
+			WIN.blit(winner_text, (WIDTH/2 - winner_text.get_width() /
+						 2, HEIGHT/2 - winner_text.get_height()/2))
+			pygame.display.update()
+			pygame.time.delay(5000)
+			break
+		if handle_player1_wins(PLAYER1, PLAYER2) == "player 1":
+			print("Player 1 Wins!")
+			winner_text = "Player 1 Wins!"
+			winner_text = WINNER_FONT.render(winner_text, 1, WHITE)
+			WIN.blit(winner_text, (WIDTH/2 - winner_text.get_width() /
+						 2, HEIGHT/2 - winner_text.get_height()/2))
+			pygame.display.update()
+			pygame.time.delay(5000)
+			break
 
 		handle_player1_movement(PLAYER1)
 		handle_player2_movement(PLAYER2)
@@ -72,7 +130,7 @@ def main():
 		handle_pong_movement()
 		draw_window()
 
-	pygame.quit()
+	main()
 
 if __name__ == "__main__":
 	main()
