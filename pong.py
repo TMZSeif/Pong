@@ -1,5 +1,6 @@
 import pygame
 import os
+import random
 
 WIDTH, HEIGHT = 900, 600
 VEL = 5
@@ -7,15 +8,28 @@ VEL = 5
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 
+PONG_DIRECTION_X = random.choice(["right", "left"])
+PONG_DIRECTION_Y = random.randint(-HEIGHT, HEIGHT)
+
 WIN = pygame.display.set_mode((WIDTH, HEIGHT), vsync=1)
 PLAYER1 = pygame.Rect(50, HEIGHT/2 - 50, 10, 100)
 PLAYER2 = pygame.Rect(WIDTH - 50, HEIGHT/2 - 50, 10, 100)
+PONG_COORDS = [WIDTH/2, HEIGHT/2]
 
 def draw_window():
 	WIN.fill(BLACK)
 	pygame.draw.rect(WIN, WHITE, PLAYER1)
 	pygame.draw.rect(WIN, WHITE, PLAYER2)
+	pong = pygame.draw.circle(WIN, WHITE, PONG_COORDS, 10)
 	pygame.display.update()
+	
+def handle_pong_movement():
+	if PONG_DIRECTION_X == "right":
+		PONG_COORDS[0] += 3
+		PONG_COORDS[1] +=  PONG_DIRECTION_Y / 200
+	else:
+		PONG_COORDS[0] -= 3
+		PONG_COORDS[1] +=  PONG_DIRECTION_Y / 200
 
 def handle_player1_movement(player1):
 	keys_pressed = pygame.key.get_pressed()
@@ -44,6 +58,7 @@ def main():
 
 		handle_player1_movement(PLAYER1)
 		handle_player2_movement(PLAYER2)
+		handle_pong_movement()
 		draw_window()
 
 	pygame.quit()
