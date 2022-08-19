@@ -2,6 +2,7 @@ import pygame
 import os
 import random
 pygame.font.init()
+pygame.mixer.init()
 
 WIDTH, HEIGHT = 900, 600
 VEL = 5
@@ -16,6 +17,9 @@ pong_direction_y = random.randint(-HEIGHT, HEIGHT)
 WINNER_FONT = pygame.font.SysFont("aria", 100)
 PLAYER1_WINS = pygame.event.Event(pygame.USEREVENT + 1)
 PLAYER2_WINS = pygame.event.Event(pygame.USEREVENT + 2)
+
+BOUNCE = pygame.mixer.Sound("Assets/bounce.mp3")
+#LONG_BOUNCE = pygame.mixer.Sound(os.path.join("Assets", "long-bounce.mp3"))
 
 WIN = pygame.display.set_mode((WIDTH, HEIGHT), vsync=1)
 PLAYER1 = pygame.Rect(50, HEIGHT/2 - 50, 10, 100)
@@ -63,8 +67,11 @@ def handle_pong_collision(player1, player2):
 	if player1.collidepoint(PONG_COORDS[0] - 5, PONG_COORDS[1]):
 		pong_direction_x = "right"
 		pong_vel += pong_vel/10
+		BOUNCE.play()
 	if player2.collidepoint(PONG_COORDS[0] + 5, PONG_COORDS[1]):
 		pong_direction_x = "left"
+		pong_vel += pong_vel/10
+		BOUNCE.play()
 
 def handle_player2_wins(player1, player2):
 	global PONG_COORDS
