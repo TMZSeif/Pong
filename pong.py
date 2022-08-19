@@ -78,31 +78,27 @@ def handle_pong_collision(player1, player2):
 def handle_player2_wins(player1, player2):
 	global PONG_COORDS
 	if PONG_COORDS[0] + 5 <= 0:
-		print("Player 2 Wins!")
 		pygame.event.post(PLAYER2_WINS)
 		PONG_COORDS = [WIDTH/2, HEIGHT/2]
 		player1.x = 50
 		player1.y = HEIGHT/2 - player1.height
 		player2.x = WIDTH - 50
 		player2.y = HEIGHT/2 - player2.height
-		print("Player 2 Wins!")
 		WIN_MUSIC.play()
-		
+		pygame.time.delay(700)
+		WIN_MUSIC.stop()
 		BACKGROUND_MUSIC.stop()
 		return "player 2"
 
 def handle_player1_wins(player1, player2):
 	global PONG_COORDS
 	if PONG_COORDS[0] - 5 >= WIDTH:
-		print(PONG_COORDS)
-		print("Player 1 Wins!")
 		pygame.event.post(PLAYER1_WINS)
 		PONG_COORDS = [WIDTH/2, HEIGHT/2]
 		player1.x = 50
 		player1.y = HEIGHT/2 - player1.height
 		player2.x = WIDTH - 50
 		player2.y = HEIGHT/2 - player2.height
-		print("Player 1 Wins!")
 		WIN_MUSIC.play()
 		pygame.time.delay(700)
 		WIN_MUSIC.stop()
@@ -127,7 +123,6 @@ def main():
 		winner_text = ""
 		
 		if handle_player2_wins(PLAYER1, PLAYER2) == "player 2":
-			print("Player 2 Wins!")
 			winner_text = "Player 2 Wins!"
 			winner_text = WINNER_FONT.render(winner_text, 1, WHITE)
 			WIN.blit(winner_text, (WIDTH/2 - winner_text.get_width() /
@@ -136,7 +131,6 @@ def main():
 			pygame.time.delay(5000)
 			break
 		if handle_player1_wins(PLAYER1, PLAYER2) == "player 1":
-			print("Player 1 Wins!")
 			winner_text = "Player 1 Wins!"
 			winner_text = WINNER_FONT.render(winner_text, 1, WHITE)
 			WIN.blit(winner_text, (WIDTH/2 - winner_text.get_width() /
