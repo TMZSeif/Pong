@@ -5,6 +5,7 @@ pygame.font.init()
 
 WIDTH, HEIGHT = 900, 600
 VEL = 5
+pong_vel = 3
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -30,10 +31,10 @@ def draw_window():
 	
 def handle_pong_movement():
 	if pong_direction_x == "right":
-		PONG_COORDS[0] += 3
+		PONG_COORDS[0] += pong_vel
 		PONG_COORDS[1] +=  pong_direction_y / 200
 	else:
-		PONG_COORDS[0] -= 3
+		PONG_COORDS[0] -= pong_vel
 		PONG_COORDS[1] +=  pong_direction_y / 200
 
 def handle_player1_movement(player1):
@@ -55,10 +56,13 @@ def handle_player2_movement(player2):
 def handle_pong_collision(player1, player2):
 	global pong_direction_x
 	global pong_direction_y
+	global pong_vel
 	if PONG_COORDS[1] + 5 >= HEIGHT or PONG_COORDS[1] - 5 <= 0:
 		pong_direction_y = -pong_direction_y
+		pong_vel += pong_vel/10
 	if player1.collidepoint(PONG_COORDS[0] - 5, PONG_COORDS[1]):
 		pong_direction_x = "right"
+		pong_vel += pong_vel/10
 	if player2.collidepoint(PONG_COORDS[0] + 5, PONG_COORDS[1]):
 		pong_direction_x = "left"
 
