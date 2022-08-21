@@ -14,7 +14,9 @@ BLACK = (0, 0, 0)
 pong_direction_x = random.choice(["right", "left"])
 pong_direction_y = random.randint(-HEIGHT, HEIGHT)
 
-WINNER_FONT = pygame.font.SysFont("aria", 100)
+WINNER_FONT = pygame.font.SysFont("aria", 60)
+START_FONT = pygame.font.SysFont("aria", 30)
+
 PLAYER1_WINS = pygame.event.Event(pygame.USEREVENT + 1)
 PLAYER2_WINS = pygame.event.Event(pygame.USEREVENT + 2)
 
@@ -27,20 +29,23 @@ PLAYER1 = pygame.Rect(50, HEIGHT/2 - 50, 10, 100)
 PLAYER2 = pygame.Rect(WIDTH - 50, HEIGHT/2 - 50, 10, 100)
 PONG_COORDS = [WIDTH/2, HEIGHT/2]
 
+
 def draw_window():
 	WIN.fill(BLACK)
 	pygame.draw.rect(WIN, WHITE, PLAYER1)
 	pygame.draw.rect(WIN, WHITE, PLAYER2)
 	pong = pygame.draw.circle(WIN, WHITE, PONG_COORDS, 10)
 	pygame.display.update()
-	
+
+
 def handle_pong_movement():
 	if pong_direction_x == "right":
 		PONG_COORDS[0] += pong_vel
-		PONG_COORDS[1] +=  pong_direction_y / 200
+		PONG_COORDS[1] += pong_direction_y / 200
 	else:
 		PONG_COORDS[0] -= pong_vel
-		PONG_COORDS[1] +=  pong_direction_y / 200
+		PONG_COORDS[1] += pong_direction_y / 200
+
 
 def handle_player1_movement(player1):
 	keys_pressed = pygame.key.get_pressed()
@@ -50,6 +55,7 @@ def handle_player1_movement(player1):
 	if keys_pressed[pygame.K_s] and (player1.y + player1.height) + VEL <= HEIGHT:
 		player1.y += VEL
 
+
 def handle_player2_movement(player2):
 	keys_pressed = pygame.key.get_pressed()
 
@@ -57,6 +63,7 @@ def handle_player2_movement(player2):
 		player2.y -= VEL
 	if (keys_pressed[pygame.K_KP_2] or keys_pressed[pygame.K_DOWN]) and (player2.y + player2.height) + VEL <= HEIGHT:
 		player2.y += VEL
+
 
 def handle_pong_collision(player1, player2):
 	global pong_direction_x
@@ -75,6 +82,7 @@ def handle_pong_collision(player1, player2):
 		pong_vel += pong_vel/10
 		BOUNCE.play()
 
+
 def handle_player2_wins(player1, player2):
 	global PONG_COORDS
 	if PONG_COORDS[0] + 5 <= 0:
@@ -89,6 +97,7 @@ def handle_player2_wins(player1, player2):
 		WIN_MUSIC.stop()
 		BACKGROUND_MUSIC.stop()
 		return "player 2"
+
 
 def handle_player1_wins(player1, player2):
 	global PONG_COORDS
@@ -105,10 +114,42 @@ def handle_player1_wins(player1, player2):
 		BACKGROUND_MUSIC.stop()
 		return "player 1"
 
-def main():
+
+def start():
+	global pong_vel
 	run = True
 	clock = pygame.time.Clock()
 	BACKGROUND_MUSIC.play(-1)
+	pong_vel = 3
+	WIN.fill(BLACK)
+	while run:
+		clock.tick(30)
+		
+		player1_text = "W and S are the controls for this player"
+		player2_text1 = "up and down arrows"
+		player2_text2 = "are the controls for this player"
+		start_text = "Press Enter to start"
+		player1_text = START_FONT.render(player1_text, 1, WHITE)
+		player2_text1 = START_FONT.render(player2_text1, 1, WHITE)
+		player2_text2 = START_FONT.render(player2_text2, 1, WHITE)
+		start_text = START_FONT.render(start_text, 1, WHITE)
+		WIN.blit(player1_text, (10, 10))
+		WIN.blit(player2_text1, (WIDTH - player2_text1.get_width()-10, 10))
+		WIN.blit(player2_text2, (WIDTH - player2_text2.get_width()-10, 50))
+		WIN.blit(start_text, (WIDTH/2 - start_text.get_width()/2, HEIGHT/2 - start_text.get_height()/2))
+		pygame.display.update()
+		for event in pygame.event.get():
+			if event.type == pygame.KEYDOWN:
+				if event.key == pygame.K_RETURN:
+					run = False
+					main()
+			if event.type == pygame.QUIT:
+				pygame.quit()
+
+
+def main():
+	run = True
+	clock = pygame.time.Clock()
 	while run:
 		clock.tick(30)
 		for event in pygame.event.get():
@@ -119,24 +160,47 @@ def main():
 				break
 			if event.type == PLAYER2_WINS:
 				break
-		
+
 		winner_text = ""
-		
+
 		if handle_player2_wins(PLAYER1, PLAYER2) == "player 2":
-			winner_text = "Player 2 Wins!"
-			winner_text = WINNER_FONT.render(winner_text, 1, WHITE)
-			WIN.blit(winner_text, (WIDTH/2 - winner_text.get_width() /
-						 2, HEIGHT/2 - winner_text.get_height()/2))
+			winner_text1 = "Player 1 Wins!"
+			winner_text2 = "Press Enter To Restart"
+			winner_text1 = WINNER_FONT.render(winner_text1, 1, WHITE)
+			winner_text2 = WINNER_FONT.render(winner_text2, 1, WHITE)
+			WIN.blit(winner_text1, (WIDTH/2 - winner_text1.get_width() /
+									2, HEIGHT/2 - winner_text1.get_height()/2))
+			WIN.blit(winner_text2, (WIDTH/2 - winner_text2.get_width() /
+									2, HEIGHT/2 - winner_text2.get_height()/2 + 60))
 			pygame.display.update()
-			pygame.time.delay(5000)
+			win = True
+			while win:
+				for event in pygame.event.get():
+					if event.type == pygame.KEYDOWN:
+						if event.key == pygame.K_KP_ENTER or event.key == pygame.K_RETURN:
+							win = False
+					if event.type == pygame.QUIT:
+						pygame.quit()
 			break
+
 		if handle_player1_wins(PLAYER1, PLAYER2) == "player 1":
-			winner_text = "Player 1 Wins!"
-			winner_text = WINNER_FONT.render(winner_text, 1, WHITE)
-			WIN.blit(winner_text, (WIDTH/2 - winner_text.get_width() /
-						 2, HEIGHT/2 - winner_text.get_height()/2))
+			winner_text1 = "Player 1 Wins!"
+			winner_text2 = "Press Enter To Restart"
+			winner_text1 = WINNER_FONT.render(winner_text1, 1, WHITE)
+			winner_text2 = WINNER_FONT.render(winner_text2, 1, WHITE)
+			WIN.blit(winner_text1, (WIDTH/2 - winner_text1.get_width() /
+									2, HEIGHT/2 - winner_text1.get_height()/2))
+			WIN.blit(winner_text2, (WIDTH/2 - winner_text2.get_width() /
+									2, HEIGHT/2 - winner_text2.get_height()/2 + 60))
 			pygame.display.update()
-			pygame.time.delay(5000)
+			win = True
+			while win:
+				for event in pygame.event.get():
+					if event.type == pygame.KEYDOWN:
+						if event.key == pygame.K_KP_ENTER or event.key == pygame.K_RETURN:
+							win = False
+					if event.type == pygame.QUIT:
+						pygame.quit()
 			break
 
 		handle_player1_movement(PLAYER1)
@@ -145,7 +209,8 @@ def main():
 		handle_pong_movement()
 		draw_window()
 
-	main()
+	start()
+
 
 if __name__ == "__main__":
-	main()
+	start()
